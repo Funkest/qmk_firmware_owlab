@@ -1,4 +1,4 @@
-/* 
+/*
 Copyright 2022 Owlab
 
 This program is free software: you can redistribute it and/or modify
@@ -17,14 +17,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
+/*
 #include "config_common.h"
+*/
 
 /* USB Device descriptor parameter */
+
 #define VENDOR_ID       0x4F53  //0x4F53 for owlab
 #define PRODUCT_ID      0x4C49  //0x4C49 LI for LINK Hotswap
-#define DEVICE_VER      0x0001 
-#define MANUFACTURER    Owlab 
-#define PRODUCT         LINK Hotswap
+#define DEVICE_VER      0x0001
+/*
+#define MANUFACTURER    Owlab
+#define PRODUCT         LINK
+*/
 
 
 /* key matrix size */
