@@ -20,3 +20,6 @@
 #ifdef NKRO_ENABLE
 #    define FORCE_NKRO
 #endif
+
+#define COMBO_COUNT 2
+#define COMBO_TERM 30

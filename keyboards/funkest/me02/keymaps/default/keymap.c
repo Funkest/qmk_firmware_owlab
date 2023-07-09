@@ -1,10 +1,17 @@
 #include QMK_KEYBOARD_H
 #include <string.h>
 
+// For register_button()
+//#include "quantum.h"
+
 // kana
 #include "kana.h"
 NGKEYS kana_keys;
 // kana
+
+//
+// Main
+//
 
 enum layer_names {
       _ALPHABET = 0
@@ -44,11 +51,12 @@ enum custom_keycodes {
       //BASE = SAFE_RANGE
       // kana
       KC_QWT = KN_SAFE_RANGE
+    , KC_KANA_ON
+    , KC_KANA_OFF
       // kana
     , KN_LSFT
     , KN_RSFT
     , KC_ALPH
-    , KC_NGNT
     , KC_L_NUM
     , KC_ASIDE
     , KC_LOFF
@@ -80,7 +88,32 @@ enum custom_keycodes {
     , RGBOFF
 };
 
-#define KC_OVR_TGL QK_KEY_OVERRIDE_TOGGLE
+//
+// Combo settings (with COMBO_COUNT and COMBO_TERM in ../../config.h)
+//
+
+enum combos {
+      ENTER_1
+    , ESC_1
+    , KANA_ON_1
+    , KANA_OFF_1
+};
+const uint16_t PROGMEM combo_enter_1[] = {KC_T, KC_W, COMBO_END};
+const uint16_t PROGMEM combo_esc_1[] = {KC_H, KC_J, COMBO_END};
+const uint16_t PROGMEM combo_kana_on_1[] = {KC_E, KC_C, COMBO_END};
+const uint16_t PROGMEM combo_kana_off_1[] = {KC_E, KC_M, COMBO_END};
+combo_t key_combos[] = {
+      [ENTER_1] = COMBO(combo_enter_1, KC_ENTER)
+    , [ESC_1] = COMBO(combo_esc_1, KC_ESC)
+    , [KANA_ON_1] = COMBO(combo_kana_on_1, KC_KANA_ON)
+    , [KANA_OFF_1] = COMBO(combo_kana_off_1, KC_KANA_OFF)
+};
+
+//
+// Main
+//
+
+#define KC_TGL_OVR_FN QK_KEY_OVERRIDE_TOGGLE
 // https://github.com/qmk/qmk_firmware/blob/master/docs/feature_key_overrides.md
 
 #include "keymap_jp.h"
@@ -148,82 +181,82 @@ const key_override_t **key_overrides = (const key_override_t *[]){
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
-  [_ALPHABET] = LAYOUT_kc( \
-      BSPC , D    , R    , N    , A      , Q    , Y    , L_NUM    , OVR_TGL   , Q    , Y    , S      , H    , J    , K    , L       \
-    , TAB  , U    , O    , I    , E      , G    , P    , DOT      , TGL_IME_FN, G    , P    , E      , T    , W    , SCLN , QUOT    \
-    , LWIN , MN_C , X    , V    , F      , L    , Z    , SPACE    , UNDS      , B    , C    , M      , COMM , DOT  , SLSH , RGB_TOG \
-    , TAB  , LOFF , LALT , xLSFT, CTL_ESC, xLSFT, LOWER, LAST     , LAST      , RAISE, xRSFT, CTL_QOT, xRSFT, RALT , EPR_RST, ENTER \
+  [_ALPHABET] = LAYOUT_kc(
+      BSPC      , D         , R         , N         , A         , Q         , Y         , L_NUM         , TGL_OVR_FN, Q         , Y         , S         , H         , J         , K         , L
+    , TAB       , U         , O         , I         , E         , G         , P         , DOT           , TGL_IME_FN, G         , P         , E         , T         , W         , SCLN      , QUOT
+    , LWIN      , MN_C      , X         , V         , F         , L         , Z         , SPACE         , UNDS      , B         , C         , M         , COMM      , DOT       , SLSH      , RGB_TOG
+    , TAB       , LOFF      , LALT      , xLSFT     , CTL_ESC   , xLSFT     , LOWER     , LAST          , LAST      , RAISE     , xRSFT     , CTL_QOT   , xRSFT     , RALT      , EPR_RST   , ENTER
 )
-, [_QWT] = LAYOUT_kc( \
-      BSPC , Q    , W    , E    , R      , T    , Y    , XXXX       , R    , T    , Y    , U      , I    , O     , P     , XXXX \
-    , TAB  , A    , S    , D    , F      , G    , H    , DOT        , F    , G    , H    , J      , K    , L     , SCLN  , TAB  \
-    , SPACE, MN_C , Z    , X    , C      , V    , B    , MINUS      , V    , B    , N    , M      , COMM , DOT   , SLSH  , RGB_TOG  \
-    , TAB  , LOFF , LALT , xLSFT, CTL_ESC, xLSFT, LOWER, SLSH       , ENTER, RAISE, xRSFT, CTL_QOT, xRSFT, RALT  , XXXX  , ENTER \
+, [_QWT] = LAYOUT_kc(
+      BSPC      , Q         , W         , E         , R         , T         , Y         , XXXX          , R         , T         , Y         , U         , I         , O         , P         , XXXX
+    , TAB       , A         , S         , D         , F         , G         , H         , DOT           , F         , G         , H         , J         , K         , L         , SCLN      , TAB
+    , SPACE     , MN_C      , Z         , X         , C         , V         , B         , MINUS         , V         , B         , N         , M         , COMM      , DOT       , SLSH      , RGB_TOG
+    , TAB       , LOFF      , LALT      , xLSFT     , CTL_ESC   , xLSFT     , LOWER     , SLSH          , ENTER     , RAISE     , xRSFT     , CTL_QOT   , xRSFT     , RALT      , XXXX      , ENTER
 )
-, [_KANA] = LAYOUT_all( \
-      _______, KN_Q   , KN_W   , KN_E   , KN_R   , KN_T   , _______, _______        , _______, _______, KN_Y   , KN_U   , KN_I   , KN_O   , KN_P   , _______ \
-    , _______, KN_A   , KN_S   , KN_D   , KN_F   , KN_G   , _______, _______        , _______, _______, KN_H   , KN_J   , KN_K   , KN_L   , KN_SCLN, KN_Z    \
-    , _______, _______, KN_Z   , KN_X   , KN_C   , KN_V   , KN_BL  , _______        , _______, KN_BR  , KN_N   , KN_M   , KN_COMM, KN_DOT , KC_SLSH, _______ \
-    , _______, _______, _______, _______, N_CTRL , KN_LSFT, N_LOWER, N_LOWER        , N_RAISE, N_RAISE, KN_RSFT, N_CTRL , _______, _______, _______, _______ \
+, [_KANA] = LAYOUT_all(
+      _______   , KN_Q      , KN_W      , KN_E      , KN_R      , KN_T      , _______   , _______       , _______   , _______   , KN_Y      , KN_U      , KN_I      , KN_O      , KN_P      , _______
+    , _______   , KN_A      , KN_S      , KN_D      , KN_F      , KN_G      , _______   , _______       , _______   , _______   , KN_H      , KN_J      , KN_K      , KN_L      , KN_SCLN   , KN_Z
+    , _______   , _______   , KN_Z      , KN_X      , KN_C      , KN_V      , KN_BL     , _______       , _______   , KN_BR     , KN_N      , KN_M      , KN_COMM   , KN_DOT    , KC_SLSH   , _______
+    , _______   , _______   , _______   , _______   , N_CTRL    , KN_LSFT   , N_LOWER   , N_LOWER       , N_RAISE   , N_RAISE   , KN_RSFT   , N_CTRL    , _______   , _______   , _______   , _______
  )
 // MS_BTN3 : mid, MS_BTN4 : browser_back, MS_BTN5 : browser_forward (KC_WBAK, KC_WFWD not work on win)
 //  https://www.autohotkey.com/docs/KeyList.htm#mouse-advanced
 // !@#%&* should be added to one-hand position.
-, [_LOWER] = LAYOUT_kc( \
-      ____ , 1    , 2    , 3    , 4    , 5    , MINUS, MS_BTN3  , ____ , DOT  , 6    , 7     , 8    , 9    , 0    ,____  \
-    , ____ , DEL  , CIRC , LBRC , RBRC , SLSH , DOT  , MS_BTN4  , ____ , EQL  , LEFT , DOWN  , UP   , RGHT , BSLS ,____  \
-    , ____ , LEFT , DOWN , UP   , RGHT , FN_EX, MINUS, MS_BTN5  , DEL  , BSPC , HOME , END   , PGUP , PGDN , GRV  , L_NUM  \
-    , ENTER, XXXX , ____ , ____ , ____ , ____ , ____ , ____     , ____ , XXXX , ____ , ____  , ____ , ____ , ____ ,____  \
+, [_LOWER] = LAYOUT_kc(
+      ____      , 1         , 2         , 3         , 4         , 5         , MINUS     , MS_BTN3       , ____      , DOT       , 6         , 7         , 8         , 9         , 0         , ____
+    , ____      , DEL       , CIRC      , LBRC      , RBRC      , SLSH      , DOT       , WBAK          , ____      , EQL       , LEFT      , DOWN      , UP        , RGHT      , BSLS      , ____
+    , ____      , LEFT      , DOWN      , UP        , RGHT      , FN_EX     , MINUS     , MS_BTN5       , DEL       , BSPC      , HOME      , END       , PGUP      , PGDN      , GRV       , L_NUM
+    , ENTER     , XXXX      , ____      , ____      , ____      , ____      , ____      , ____          , ____      , XXXX      , ____      , ____      , ____      , ____      , ____      , ____
 )
 //  ____ causes Kana-off when BSPC on _LOWER with mis-touching this key (send RAISE tapping) .
-, [_RAISE] = LAYOUT_kc( \
-      ____, 1    , 2    , 3    , 4    , 5    , MINUS, ____      ,____ , DOT    , 6    , 7    , 8    , 9    , 0    , PSCR    \
-    , ____, ____ , ____ , LBRC , RBRC , SLSH , DOT  , ____      ,____ , PPLS   , EQL  , LCBR , RCBR , DLR  , BSLS , DQUO    \
-    , ____, ____ , ____ , BR_PR, BR_SQ, MINUS, MINUS, ____      ,____ , WIN_EX , FN_EX, LPRN , RPRN , BSPC , GRV  , ____    \
-    , ____, QWT  , ____ , ____ , ____ , ____ , ____ , ____      ,____ , ____   , ____ , ____ , ____ , ____ , ____ , ____    \
+, [_RAISE] = LAYOUT_kc(
+      ____      , 1         , 2         , 3         , 4         , 5         , MINUS     , ____          , ____      , DOT       , 6         , 7         , 8         , 9         , 0         , PSCR
+    , ____      , ____      , ____      , LBRC      , RBRC      , SLSH      , DOT       , ____          , ____      , PPLS      , EQL       , LCBR      , RCBR      , DLR       , BSLS      , DQUO
+    , ____      , ____      , ____      , BR_PR     , BR_SQ     , MINUS     , MINUS     , ____          , ____      , WIN_EX    , FN_EX     , LPRN      , RPRN      , BSPC      , GRV       , ____
+    , ____      , QWT       , ____      , ____      , ____      , ____      , ____      , ____          , ____      , ____      , ____      , ____      , ____      , ____      , ____      , ____
 )
 
-, [_ONLY_NUMBERS] = LAYOUT_kc( \
-      ____ , 1    , 2    , 3    , 4    , 5    , MINUS, LOFF     , ____ , DOT  , 6    , 7    , 8    , 9    , 0    , ____  \
-    , ____ , 6    , 7    , 8    , 9    , 0    , DOT  , ____     , ____ , EQL  , LEFT , DOWN , UP   , RGHT , BSLS , ____  \
-    , ____ , MINUS, DOT  , COMM , DEL  , BSPC , FN_EX, MINUS    , ____ , ____ , ____ , ____ , ____ , ____ , ____ , ____  \
-    , ____ , ____ , ____ , ____ , ____ , ____ , ____ , ____     , ____ , ____ , ____ , ____ , ____ , ____ , ____ , ____  \
+, [_ONLY_NUMBERS] = LAYOUT_kc(
+      ____      , 1         , 2         , 3         , 4         , 5         , MINUS     , LOFF          , ____      , DOT       , 6         , 7         , 8         , 9         , 0         , ____
+    , ____      , 6         , 7         , 8         , 9         , 0         , DOT       , ____          , ____      , EQL       , LEFT      , DOWN      , UP        , RGHT      , BSLS      , ____
+    , ____      , MINUS     , DOT       , COMM      , DEL       , BSPC      , FN_EX     , MINUS         , ____      , ____      , ____      , ____      , ____      , ____      , ____      , ____
+    , ____      , ____      , ____      , ____      , ____      , ____      , ____      , ____          , ____      , ____      , ____      , ____      , ____      , ____      , ____      , ____
 )
 
-, [_ONE_SIDE] = LAYOUT_kc( \
-      ____ , 1    , 2    , 3    , 4    , 5    , MINUS, ____     , ____ , DOT  , 6    , 7    , 8    , 9    , 0    , ____  \
-    , ____ , DEL  , RGHT , UP   , DOWN , LEFT , DOT  , LOFF     , TAB  , EQL  , LEFT , DOWN  , UP   , RGHT , BSLS ,____  \
-    , ____ , BSPC , PGDN , PGUP , END  , HOME , SPACE, ____     , SPACE, BSPC , HOME , END   , PGUP , PGDN , GRV  ,____  \
-    , ____ , ____ , ____ , ____ , ____ , ____ , ____ , ____     , ____ , ____ , ____ , ____ , ____ , ____ , ____ , ____  \
+, [_ONE_SIDE] = LAYOUT_kc(
+      ____      , 1         , 2         , 3         , 4         , 5         , MINUS     , ____          , ____      , DOT       , 6         , 7         , 8         , 9         , 0         , ____
+    , ____      , DEL       , RGHT      , UP        , DOWN      , LEFT      , DOT       , LOFF          , TAB       , EQL       , LEFT      , DOWN      , UP        , RGHT      , BSLS      , ____
+    , ____      , BSPC      , PGDN      , PGUP      , END       , HOME      , SPACE     , ____          , SPACE     , BSPC      , HOME      , END       , PGUP      , PGDN      , GRV       , ____
+    , ____      , ____      , ____      , ____      , ____      , ____      , ____      , ____          , ____      , ____      , ____      , ____      , ____      , ____      , ____      , ____
 )
 
-, [_ALT_WIN] = LAYOUT_kc( \
-      ____, Q   , W   , E    , R      , T      , Y    , XXXX    , R    , T    , Y    , U      , I    , O    , P    , XXXX  \
-    , ____, A   , S   , D    , F      , G      , H    , XXXX    , F    , G    , H    , J      , K    , L    , SCLN , XXXX  \
-    , ____, ____, Z   , X    , C      , V      , B    , N       , V    , B    , N    , M      , COMM , DOT  , SLSH , XXXX  \
-    , LOFF, TAB , XXXX, ____ , ____   , ____   , LOWER, XXXX    , XXXX , RAISE, ____   , ____ , XXXX , XXXX , XXXX , ENTER \
+, [_ALT_WIN] = LAYOUT_kc(
+      ____      , Q         , W         , E         , R         , T         , Y         , XXXX          , R         , T         , Y         , U         , I         , O         , P         , XXXX
+    , ____      , A         , S         , D         , F         , G         , H         , XXXX          , F         , G         , H         , J         , K         , L         , SCLN      , XXXX
+    , ____      , ____      , Z         , X         , C         , V         , B         , N             , V         , B         , N         , M         , COMM      , DOT       , SLSH      , XXXX
+    , LOFF      , TAB       , XXXX      , ____      , ____      , ____      , LOWER     , XXXX          , XXXX      , RAISE     , ____      , ____      , XXXX      , XXXX      , XXXX      , ENTER
 )
 
-, [_ALT_WIN_B] = LAYOUT_kc( \
-      ____ , D    , R    , N    , A    , Q    , ____ , ____     , ____ , ____ , Y    , S    , H    , J    , K    , L     \
-    , ____ , U    , O    , I    , E    , G    , ____ , ____     , ____ , ____ , P    , E    , T    , W    , SCLN , ____  \
-    , ____ , ____ , X    , V    , F    , L    , Z    , ____     , ____ , B    , C    , M    , COMM , DOT  , SLSH , ____  \
-    , LOFF , TAB  , ____ , ____ , ____ , ____ , LOWER, ____     , ____ , RAISE, ____ , ____ , ____ , ____ , ____ , ENTER \
+, [_ALT_WIN_B] = LAYOUT_kc(
+      ____      , D         , R         , N         , A         , Q         , ____      , ____          , ____      , ____      , Y         , S         , H         , J         , K         , L
+    , ____      , U         , O         , I         , E         , G         , ____      , ____          , ____      , ____      , P         , E         , T         , W         , SCLN      , ____
+    , ____      , ____      , X         , V         , F         , L         , Z         , ____          , ____      , B         , C         , M         , COMM      , DOT       , SLSH      , ____
+    , LOFF      , TAB       , ____      , ____      , ____      , ____      , LOWER     , ____          , ____      , RAISE     , ____      , ____      , ____      , ____      , ____      , ENTER
 )
 
-, [_FN] = LAYOUT_kc( \
-      ____, F1  , F2  , F3  , F4  , F5  , F6  , ____            , ____ , F1   , F2   , F3   , F4   , F5   , F6  , ____  \
-    , ____, F7  , F8  , F9  , F10 , F11 , F12 , ____            , ____ , F7   , F8   , F9   , F10  , F11  , F12 , ____  \
-    , ____, XXXX, XXXX, LALT, XXXX, XXXX, XXXX, ____            , ____ , ALLUP, XXXX , XXXX , RALT , XXXX , XXXX, ____  \
-    , ____, ____, ____, ____, ____, ____, ____, ____            , ____ , ____ , ____ , ____ , ASIDE, ____ , ____, NGNT \
-   )
+, [_FN] = LAYOUT_kc(
+      ____      , F1        , F2        , F3        , F4        , F5        , F6        , ____          , ____      , F1        , F2        , F3        , F4        , F5        , F6        , ____
+    , ____      , F7        , F8        , F9        , F10       , F11       , F12       , ____          , ____      , F7        , F8        , F9        , F10       , F11       , F12       , ____
+    , ____      , XXXX      , XXXX      , LALT      , XXXX      , XXXX      , XXXX      , ____          , ____      , ALLUP     , XXXX      , XXXX      , RALT      , XXXX      , XXXX      , ____
+    , ____      , ____      , ____      , ____      , ____      , ____      , ____      , ____          , ____      , ____      , ____      , ____      , ASIDE     , ____      , ____      , KANA_ON
+)
 
-, [_RGB] = LAYOUT_all( \
-      RGBRST, RGB_HUI, RGB_MOD , _______, _______, _______, _______, _______        , _______, _______, _______, _______, _______, _______, _______, _______ \
-    , RGB1  , RGB_VAI, RGBOFF  , KC_F8  ,   KC_F9, KC_LOFF, _______, _______        , _______, _______, _______, _______, _______, _______, _______, _______ \
-    , RGB2  , RGB_VAD, KC_F4   , KC_F5  ,   KC_F6, KC_F12 , _______, _______        , _______, _______, _______, _______, _______, _______, _______, _______ \
-    , RGB3  , KC_F10 , KC_F1   , KC_F2  ,   KC_F3, KC_F11 , _______, _______        , _______, _______, _______, _______, _______, _______, _______, _______ \
-      )
+, [_RGB] = LAYOUT_all(
+      RGBRST    , RGB_HUI   , RGB_MOD   , _______   , _______   , _______   , _______   , _______       , _______   , _______   , _______   , _______   , _______   , _______   , _______   , _______
+    , RGB1      , RGB_VAI   , RGBOFF    , KC_F8     , KC_F9     , KC_LOFF   , _______   , _______       , _______   , _______   , _______   , _______   , _______   , _______   , _______   , _______
+    , RGB2      , RGB_VAD   , KC_F4     , KC_F5     , KC_F6     , KC_F12    , _______   , _______       , _______   , _______   , _______   , _______   , _______   , _______   , _______   , _______
+    , RGB3      , KC_F10    , KC_F1     , KC_F2     , KC_F3     , KC_F11    , _______   , _______       , _______   , _______   , _______   , _______   , _______   , _______   , _______   , _______
+)
 
 // need BACKSLASH (removed for comment)
 // , [_EUCALYN] = LAYOUT_kc(
@@ -256,6 +289,14 @@ static bool ctrl_l_interrupted  = false;
 static bool ctrl_r_interrupted  = false;
 static bool sft_l_x_interrupted = true;
 static bool sft_r_x_interrupted = true;
+static bool kana_i_pressed = false;
+static bool kana_o_pressed = false;
+static bool kana_k_pressed = false;
+static bool kana_l_pressed = false;
+static bool kana_j_pressed = false;
+static bool kana_m_pressed = false;
+static bool kana_n_pressed = false;
+static bool suppress_kana = false;
 static bool delayed_l_sfted_keypressed = true;
 static bool delayed_r_sfted_keypressed = true;
 static bool just_ime_toggled    = false;
@@ -273,6 +314,13 @@ uint16_t last_pressed_ctrl_r    = 0;
 uint16_t last_pressed_raise     = 0;
 uint16_t last_pressed_lower     = 0;
 uint16_t last_pressed_key       = 0;
+uint16_t last_pressed_kana_i    = 0;
+uint16_t last_pressed_kana_o    = 0;
+uint16_t last_pressed_kana_k    = 0;
+uint16_t last_pressed_kana_l    = 0;
+uint16_t last_pressed_kana_j    = 0;
+uint16_t last_pressed_kana_m    = 0;
+uint16_t last_pressed_kana_n    = 0;
 
 const uint16_t TAP_TIME = 200;
 
@@ -287,6 +335,14 @@ void clear_all_flags(void) {
     sft_r_x_interrupted     = true;
     delayed_l_sfted_keypressed= true;
     delayed_r_sfted_keypressed= true;
+    kana_i_pressed = false;
+    kana_o_pressed = false;
+    kana_k_pressed = false;
+    kana_l_pressed = false;
+    kana_j_pressed = false;
+    suppress_kana = false;
+    kana_m_pressed = false;
+    kana_n_pressed = false;
 }
 void up_all_modKeys(void) {
     unregister_code(KC_LSFT);
@@ -533,6 +589,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     // set_timelog();
     //
         switch (keycode){
+            // process KC_MS_BTN1~8 by myself
+            // See process_action() in quantum/action.c for details.
+            //case KC_MS_BTN1 ... KC_MS_BTN8: {
+            //    extern void register_mouse(bool, enum mouse_buttons);
+            //    register_mouse(record->event.pressed, MOUSE_BTN_MASK(keycode - KC_MS_BTN1));
+            //    return false;
+            //}
             case KC_xLSFT:
                 sft_l_x_interrupted = false;
                 last_pressed_shf_x_l = timer_read();
@@ -707,10 +770,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             clear_all_flags();
             up_all_modKeys();
             break;
-        case KC_NGNT:
+        case KC_KANA_ON:
             if (record->event.pressed) {
                 kana_on(! sft_r_x_interrupted, use_fn_for_ime_toggle);
-                is_just_kana_on = true; }
+            }
+            break;
+        case KC_KANA_OFF:
+            if (record->event.pressed) {
+                kana_off(! sft_l_x_interrupted, use_fn_for_ime_toggle);
+            }
             break;
         // kana
         case KC_LOFF:
@@ -776,14 +844,68 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case N_OFF_K:
             if (record->event.pressed) {
                 //kana_off_keep_ime(); }
-                kana_off(! sft_l_x_interrupted, use_fn_for_ime_toggle); }
+                kana_off(! sft_l_x_interrupted, use_fn_for_ime_toggle);
+            }
             return false;
-        // kana
         default:
-            if (keycode < KN_SAFE_RANGE){
-              // kana
-              if (!process_kana(keycode, record))
-                return false; }
+            // kana
+            if (keycode < KN_SAFE_RANGE) {
+                if (record->event.pressed) {
+                    switch (keycode) {
+                        case KN_I: kana_i_pressed = true; last_pressed_kana_i = timer_read(); break;
+                        case KN_O: kana_o_pressed = true; last_pressed_kana_o = timer_read(); break;
+                        case KN_K: kana_k_pressed = true; last_pressed_kana_k = timer_read(); break;
+                        case KN_L: kana_l_pressed = true; last_pressed_kana_l = timer_read(); break;
+                        case KN_J: kana_j_pressed = true; last_pressed_kana_j = timer_read(); break;
+                        case KN_M: kana_m_pressed = true; last_pressed_kana_m = timer_read(); break;
+                        case KN_N: kana_n_pressed = true; last_pressed_kana_n = timer_read(); break;
+                        default: break;
+                    }
+                    // KN_J + KN_M: kana off
+                    if (kana_j_pressed && kana_m_pressed && abs(timer_elapsed(last_pressed_kana_j) - timer_elapsed(last_pressed_kana_m)) < COMBO_TERM) {
+                        kana_off(! sft_l_x_interrupted, use_fn_for_ime_toggle);
+                        suppress_kana = true;
+                    }
+                    // KN_J + KN_N: Do nothing (kana on)
+                    else if (kana_j_pressed && kana_n_pressed && abs(timer_elapsed(last_pressed_kana_j) - timer_elapsed(last_pressed_kana_n)) < COMBO_TERM) {
+                        suppress_kana = true;
+                    }
+                    // KN_I + KN_O: KC_ESC
+                    else if (kana_i_pressed && kana_o_pressed && abs(timer_elapsed(last_pressed_kana_i) - timer_elapsed(last_pressed_kana_o)) < COMBO_TERM) {
+                        suppress_kana = true;
+                        tap_code16(KC_ESC);
+                    }
+                    // KN_K + KN_L: KC_ENTER
+                    else if (kana_k_pressed && kana_l_pressed && abs(timer_elapsed(last_pressed_kana_k) - timer_elapsed(last_pressed_kana_l)) < COMBO_TERM) {
+                        suppress_kana = true;
+                        tap_code16(KC_ENTER);
+                    }
+                }
+                else {
+                    switch (keycode) {
+                        case KN_I: kana_i_pressed = false; break;
+                        case KN_O: kana_o_pressed = false; break;
+                        case KN_K: kana_k_pressed = false; break;
+                        case KN_L: kana_l_pressed = false; break;
+                        case KN_J: kana_j_pressed = false; break;
+                        case KN_M: kana_m_pressed = false; break;
+                        case KN_N: kana_n_pressed = false; break;
+                        default: break;
+                    }
+                    if (suppress_kana) {
+                        // Reset kana buffers.
+                        if (kana_state()) kana_on(! sft_r_x_interrupted, use_fn_for_ime_toggle);
+                        suppress_kana = false;
+                        return false;
+                    }
+                }
+
+                // Output kana
+                if (suppress_kana || ! process_kana(keycode, record)) {
+                    return false;
+                }
+            }
+            // kana
 
             if (record->event.pressed) {
                 //if (sft_l_x_interrupted) {

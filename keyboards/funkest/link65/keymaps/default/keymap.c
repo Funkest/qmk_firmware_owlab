@@ -6,6 +6,25 @@
 NGKEYS kana_keys;
 // kana
 
+//
+// Combo settings (with COMBO_COUNT and COMBO_TERM in ../../config.h)
+//
+
+enum combos {
+    ENTER_1
+  , ESC_1
+};
+const uint16_t PROGMEM combo_enter_1[] = {KC_T, KC_W, COMBO_END};
+const uint16_t PROGMEM combo_esc_1[] = {KC_H, KC_J, COMBO_END};
+combo_t key_combos[] = {
+    [ENTER_1] = COMBO(combo_enter_1, KC_ENTER)
+  , [ESC_1] = COMBO(combo_esc_1, KC_ESC)
+};
+
+//
+// Main
+//
+
 enum layer_names {
       _ALPHABET = 0
     , _QWT
@@ -169,7 +188,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 //  https://www.autohotkey.com/docs/KeyList.htm#mouse-advanced
 , [_LOWER] = LAYOUT_kc( \
       ____      , 1         , 2         , 3         , 4         , 5             , MINS      , DOT       , 6         , 7         , 8         , 9         , 0             , ____      , ____
-    , ____      , DEL       , CIRC      , LBRC      , RBRC      , SLSH          , MS_BTN4   , LEFT      , DOWN      , UP        , RGHT      , BSLS      , QUOT          , ____      , ____
+    , ____      , DEL       , CIRC      , LBRC      , RBRC      , SLSH          , ____      , LEFT      , DOWN      , UP        , RGHT      , BSLS      , QUOT          , ____      , ____
     , ____      , LEFT      , DOWN      , UP        , RGHT      , FN_EX         , DEL       , BSPC      , HOME      , END       , PGUP      , PGDN                      , GRV       , ____
     , ENTER     , XXXX      , ____      , ____      , ____      , ____          , ____      , XXXX      , ____      , ____      , ____      , ____                      , ____      , ____
     , ____, ____, ____, ____, ____, ____, ____, ____, ____
@@ -202,7 +221,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 , [_FN] = LAYOUT_kc( \
       F1        , F2        , F3        , F4        , F5        , F6            , F1        , F2        , F3        , F4        , F5        , F6        , ____          , ____      , ____
     , F7        , F8        , F9        , F10       , F11       , F12           , F7        , F8        , F9        , F10       , F11       , F12       , ____          , ____      , ____
-    , XXXX      , XXXX      , LALT      , XXXX      , XXXX      , XXXX          , ALLUP     , XXXX      , XXXX      , RALT      , XXXX      , XXXX                      , ____      , ____
+    , XXXX      , XXXX      , LALT      , MS_BTN4   , MS_BTN5   , XXXX          , ALLUP     , XXXX      , XXXX      , RALT      , XXXX      , XXXX                      , ____      , ____
     , ____      , ____      , ____      , ____      , ____      , ____          , ____      , ____      , ____      , ____,      ____       , ____                      , ____      , ____
     , ____, ____, ____, ____, ____, ____, ____, ____, ____
 )
