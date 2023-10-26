@@ -1,2 +1,2 @@
-#define COMBO_COUNT 4
-#define COMBO_TERM 35
+#define COMBO_COUNT 5
+#define COMBO_TERM 25

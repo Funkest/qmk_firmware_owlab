@@ -5,8 +5,8 @@
     , "maintainer": "me"
     , "bootloader": "stm32-dfu"
     , "usb": {
-          "vid": "0x0001"
-        , "pid": "0x0001"
+          "vid": "0x0009"
+        , "pid": "0x0009"
         , "device_version": "0.0.1"
     }
 }

@@ -89,7 +89,7 @@ enum custom_keycodes {
 };
 
 //
-// Combo settings (with COMBO_COUNT and COMBO_TERM in ../../config.h)
+// !!! NOTE !!! Set COMBO_COUNT and COMBO_TERM in ../../config.h.
 //
 
 enum combos {
@@ -97,16 +97,20 @@ enum combos {
     , ESC_1
     , KANA_ON_1
     , KANA_OFF_1
+    , TAB_1
 };
+
 const uint16_t PROGMEM combo_enter_1[] = {KC_T, KC_W, COMBO_END};
-const uint16_t PROGMEM combo_esc_1[] = {KC_H, KC_J, COMBO_END};
-const uint16_t PROGMEM combo_kana_on_1[] = {KC_E, KC_C, COMBO_END};
-const uint16_t PROGMEM combo_kana_off_1[] = {KC_E, KC_M, COMBO_END};
+const uint16_t PROGMEM combo_esc_1[] = {KC_O, KC_I, COMBO_END};
+const uint16_t PROGMEM combo_kana_on_1[] = {KC_E, KC_T, COMBO_END};
+const uint16_t PROGMEM combo_kana_off_1[] = {KC_E, KC_I, COMBO_END};
+const uint16_t PROGMEM combo_tab_1[] = {KC_U, KC_O, COMBO_END};
 combo_t key_combos[] = {
       [ENTER_1] = COMBO(combo_enter_1, KC_ENTER)
     , [ESC_1] = COMBO(combo_esc_1, KC_ESC)
     , [KANA_ON_1] = COMBO(combo_kana_on_1, KC_KANA_ON)
     , [KANA_OFF_1] = COMBO(combo_kana_off_1, KC_KANA_OFF)
+    , [TAB_1] = COMBO(combo_tab_1, KC_TAB)
 };
 
 //
@@ -147,7 +151,7 @@ const key_override_t rcbr_direct_key_override   = ko_make_with_layers_and_negmod
 const key_override_t ppls_direct_key_override   = ko_make_with_layers_and_negmods(0, KC_PPLS, JP_PLUS, ~0, (uint8_t) MOD_MASK_SHIFT);    // + to +
 const key_override_t dquo_direct_key_override   = ko_make_with_layers_and_negmods(0, KC_DQUO, JP_DQUO, ~0, (uint8_t) MOD_MASK_SHIFT);    // " to "
 
-const key_override_t **key_overrides = (const key_override_t *[]){
+const key_override_t **key_overrides = (const key_override_t *[]) {
       &at_key_override
     , &circ_key_override
     , &ampr_key_override
@@ -204,8 +208,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // !@#%&* should be added to one-hand position.
 , [_LOWER] = LAYOUT_kc(
       ____      , 1         , 2         , 3         , 4         , 5         , MINUS     , MS_BTN3       , ____      , DOT       , 6         , 7         , 8         , 9         , 0         , ____
-    , ____      , DEL       , CIRC      , LBRC      , RBRC      , SLSH      , DOT       , WBAK          , ____      , EQL       , LEFT      , DOWN      , UP        , RGHT      , BSLS      , ____
-    , ____      , LEFT      , DOWN      , UP        , RGHT      , FN_EX     , MINUS     , MS_BTN5       , DEL       , BSPC      , HOME      , END       , PGUP      , PGDN      , GRV       , L_NUM
+    , ____      , DEL       , CIRC      , LBRC      , RBRC      , SLSH      , DOT       , MS_BTN4       , ____      , EQL       , LEFT      , DOWN      , UP        , RGHT      , BSLS      , ____
+    , LCTL      , LEFT      , DOWN      , UP        , RGHT      , FN_EX     , MINUS     , MS_BTN5       , DEL       , BSPC      , HOME      , END       , PGUP      , PGDN      , GRV       , L_NUM
     , ENTER     , XXXX      , ____      , ____      , ____      , ____      , ____      , ____          , ____      , XXXX      , ____      , ____      , ____      , ____      , ____      , ____
 )
 //  ____ causes Kana-off when BSPC on _LOWER with mis-touching this key (send RAISE tapping) .
@@ -289,13 +293,13 @@ static bool ctrl_l_interrupted  = false;
 static bool ctrl_r_interrupted  = false;
 static bool sft_l_x_interrupted = true;
 static bool sft_r_x_interrupted = true;
-static bool kana_i_pressed = false;
-static bool kana_o_pressed = false;
+static bool kana_a_pressed = false;
+static bool kana_s_pressed = false;
+static bool kana_d_pressed = false;
 static bool kana_k_pressed = false;
 static bool kana_l_pressed = false;
 static bool kana_j_pressed = false;
-static bool kana_m_pressed = false;
-static bool kana_n_pressed = false;
+static bool kana_f_pressed = false;
 static bool suppress_kana = false;
 static bool delayed_l_sfted_keypressed = true;
 static bool delayed_r_sfted_keypressed = true;
@@ -314,13 +318,13 @@ uint16_t last_pressed_ctrl_r    = 0;
 uint16_t last_pressed_raise     = 0;
 uint16_t last_pressed_lower     = 0;
 uint16_t last_pressed_key       = 0;
-uint16_t last_pressed_kana_i    = 0;
-uint16_t last_pressed_kana_o    = 0;
+uint16_t last_pressed_kana_a    = 0;
+uint16_t last_pressed_kana_s    = 0;
+uint16_t last_pressed_kana_d    = 0;
 uint16_t last_pressed_kana_k    = 0;
 uint16_t last_pressed_kana_l    = 0;
 uint16_t last_pressed_kana_j    = 0;
-uint16_t last_pressed_kana_m    = 0;
-uint16_t last_pressed_kana_n    = 0;
+uint16_t last_pressed_kana_f    = 0;
 
 const uint16_t TAP_TIME = 200;
 
@@ -335,14 +339,14 @@ void clear_all_flags(void) {
     sft_r_x_interrupted     = true;
     delayed_l_sfted_keypressed= true;
     delayed_r_sfted_keypressed= true;
-    kana_i_pressed = false;
-    kana_o_pressed = false;
+    kana_a_pressed = false;
+    kana_s_pressed = false;
+    kana_d_pressed = false;
     kana_k_pressed = false;
     kana_l_pressed = false;
     kana_j_pressed = false;
     suppress_kana = false;
-    kana_m_pressed = false;
-    kana_n_pressed = false;
+    kana_f_pressed = false;
 }
 void up_all_modKeys(void) {
     unregister_code(KC_LSFT);
@@ -356,110 +360,121 @@ void up_all_modKeys(void) {
     set_single_persistent_default_layer(_ALPHABET);
 }
 void layer_switch_with_tapping(uint16_t layercode, uint16_t tapkey, bool *is_interrupted, uint16_t *timestamp, keyrecord_t *record, uint16_t keycode) {
-
-    if (record->event.pressed){
+    if (record->event.pressed) {
         (*timestamp) = timer_read();
         (*is_interrupted) = false;
-        // for IME toggle with AHK lsft space / lsfr lctrl space (To toggle not 'on up' but 'on push'.)
-        // if (layercode == _RAISE && (! sft_l_x_interrupted || ! sft_r_x_interrupted || (! sft_l_x_interrupted && ! ctrl_l_interrupted))) {
-        // for IME toggle with AHK lsft space / rsfr space (To toggle not 'on up' but 'on push'.)
 
-        //if (layercode == _RAISE && is_LSHFT_pressed){
-        if (layercode == _RAISE && ! sft_l_x_interrupted){
-            kana_off(! sft_l_x_interrupted, use_fn_for_ime_toggle);
-            just_ime_toggled = true; }
-            // tap_code(tapkey); // With AHK LSHIFT + SPACE.
-        //if (layercode == _LOWER && is_RSHFT_pressed){
-        if (layercode == _LOWER && ! sft_r_x_interrupted){
-            kana_on(! sft_r_x_interrupted, use_fn_for_ime_toggle);
-            is_just_kana_on = true;
-            just_ime_toggled = true; }
+        //if (layercode == _RAISE && ! sft_l_x_interrupted) {
+        //    kana_off(! sft_l_x_interrupted, use_fn_for_ime_toggle);
+        //    just_ime_toggled = true; }
+        //if (layercode == _LOWER && ! sft_r_x_interrupted) {
+        //    kana_on(! sft_r_x_interrupted, use_fn_for_ime_toggle);
+        //    is_just_kana_on = true;
+        //    just_ime_toggled = true; }
+
         // kana
-        if (keycode == N_LOWER || keycode == N_RAISE){
+        if (keycode == N_LOWER || keycode == N_RAISE) {
             kana_off_keep_ime();
-            keep_kana = true; }
+            keep_kana = true;
+        }
         // kana
         layer_on(layercode);
-    }
-    else {
+    } else {
         // kana
-        if (keep_kana && (keycode == N_LOWER || keycode == N_RAISE)){
-            kana_on_keep_ime(); }
+        if (keep_kana && (keycode == N_LOWER || keycode == N_RAISE)) {
+            kana_on_keep_ime();
+        }
         keep_kana = false;
         // kana
         layer_off(layercode);
-        if (! (*is_interrupted)){
+        if (! (*is_interrupted)) {
             if (! just_ime_toggled && timer_elapsed(*timestamp) < TAP_TIME) {
                 // kana
-                if (is_just_kana_on){
+                if (is_just_kana_on) {
                     is_just_kana_on = false;
-                    return; }
+                    return;
+                }
                 // kana
-                if (! sft_l_x_interrupted || ! sft_r_x_interrupted){
-                    return;}
-                tap_code(tapkey); }
-            else {
+                if (! sft_l_x_interrupted || ! sft_r_x_interrupted) {
+                    return;
+                }
+                tap_code(tapkey);
+            } else {
                 just_ime_toggled = false;
-                is_just_kana_on = false; } } }
+                is_just_kana_on = false;
+            }
+        }
+    }
 }
+
 void modifier_key_with_tapping(uint16_t modkey, uint16_t tapkey, bool *is_interrupted, uint16_t *timestamp, keyrecord_t *record) {
     if (record->event.pressed) {
         (*timestamp) = timer_read();
         (*is_interrupted) = false;
-        register_code(modkey); }
-    else {
+        register_code(modkey);
+    } else {
         unregister_code(modkey);
         if (! (*is_interrupted)) {
             bool shiftIsActive = ! sft_l_x_interrupted || ! sft_r_x_interrupted;
             clear_all_flags();
             if (timer_elapsed(*timestamp) < TAP_TIME) {
                 // not work. -> process_key_override(tapkey, record);
-                if (key_override_is_enabled()){
-                    if (tapkey == KC_QUOT){
-                        if (shiftIsActive){
-                            tap_code(KC_2); }
-                        else {
-                            tap_code16(S(KC_7)); } }
-                    else {
-                        tap_code(tapkey); } }
-                else {
-                    tap_code(tapkey); }
-            } } }
+                if (key_override_is_enabled()) {
+                    if (tapkey == KC_QUOT) {
+                        if (shiftIsActive) {
+                            tap_code(KC_2);
+                        } else {
+                            tap_code16(S(KC_7));
+                        }
+                    } else {
+                        tap_code(tapkey);
+                    }
+                } else {
+                    tap_code(tapkey);
+                }
+            }
+        }
+    }
 }
 
 void modifier_key_with_tapping_ng(uint16_t modkey, uint16_t tapkey, bool *is_interrupted, uint16_t *timestamp, keyrecord_t *record) {
-
     if (record->event.pressed) {
         (*timestamp) = timer_read();
         (*is_interrupted) = false;
         register_code(modkey);
 
-        if (kana_state()){
+        if (kana_state()) {
             keep_kana = true;
-            kana_off_keep_ime(); } }
-    else {
-        if (keep_kana){
+            kana_off_keep_ime();
+        }
+    } else {
+        if (keep_kana) {
             keep_kana = false;
             unregister_code(modkey);
             kana_on_keep_ime();
-            register_code(modkey); }
+            register_code(modkey);
+        }
 
         unregister_code(modkey);
         if (! (*is_interrupted)) {
             clear_all_flags();
             if (timer_elapsed(*timestamp) < TAP_TIME) {
-                tap_code(tapkey); } } }
+                tap_code(tapkey);
+            }
+        }
+    }
 }
 
 // この関数で mod keys に関して bug 発生するかも
 
 void send_key_set(uint16_t key, uint16_t l_key, uint16_t r_key, keyrecord_t *record) {
-    if (! record->event.pressed){
+    if (! record->event.pressed) {
         tap_code16(l_key);
         tap_code16(r_key);
         clear_mods();
         clear_all_flags();
-        tap_code(KC_LEFT); }
+        tap_code(KC_LEFT);
+    }
 }
 
 //int combined_key_to_led[] =
@@ -473,8 +488,8 @@ void send_key_set(uint16_t key, uint16_t l_key, uint16_t r_key, keyrecord_t *rec
 #ifdef RGBLIGHT_ENABLE
 
 struct keybuf {
-  char col, row;
-  char frame;
+    char col, row;
+    char frame;
 };
 struct keybuf keybufs[256];
 unsigned char keybuf_begin, keybuf_end;
@@ -494,54 +509,56 @@ void led_ripple_effect(char r, char g, char b) {
     static int keys_sum[] = { 0, 6, 12, 18, 25 };
 
     if (scan_count == -1) {
-      rgblight_enable_noeeprom();
-      rgblight_mode(RGBLIGHT_MODE_STATIC_LIGHT);
+        rgblight_enable_noeeprom();
+        rgblight_mode(RGBLIGHT_MODE_STATIC_LIGHT);
     } else if (scan_count >= 0 && scan_count < 5) {
-      for (unsigned char c=keybuf_begin; c!=keybuf_end; c++) {
-        int i = c;
-        // FIXME:
+        for (unsigned char c=keybuf_begin; c!=keybuf_end; c++) {
+            int i = c;
+            // FIXME:
 
-        int y = scan_count;
-        int dist_y = abs(y - keybufs[i].row);
-        for (int x=0; x<keys[y]; x++) {
-          int dist = abs(x - keybufs[i].col) + dist_y;
-          if (dist <= keybufs[i].frame) {
-            int elevation = MAX(0, (8 + dist - keybufs[i].frame)) << 2;
-            if (elevation) {
-              if ((rgb[x][y][0] != 255) && r) { rgb[x][y][0] = MIN(255, elevation + rgb[x][y][0]); }
-              if ((rgb[x][y][1] != 255) && g) { rgb[x][y][1] = MIN(255, elevation + rgb[x][y][1]); }
-              if ((rgb[x][y][2] != 255) && b) { rgb[x][y][2] = MIN(255, elevation + rgb[x][y][2]); }
+            int y = scan_count;
+            int dist_y = abs(y - keybufs[i].row);
+            for (int x=0; x<keys[y]; x++) {
+                int dist = abs(x - keybufs[i].col) + dist_y;
+                if (dist <= keybufs[i].frame) {
+                    int elevation = MAX(0, (8 + dist - keybufs[i].frame)) << 2;
+                    if (elevation) {
+                        if ((rgb[x][y][0] != 255) && r) rgb[x][y][0] = MIN(255, elevation + rgb[x][y][0]);
+                        if ((rgb[x][y][1] != 255) && g) rgb[x][y][1] = MIN(255, elevation + rgb[x][y][1]);
+                        if ((rgb[x][y][2] != 255) && b) rgb[x][y][2] = MIN(255, elevation + rgb[x][y][2]);
+                    }
+                }
             }
-          }
         }
-      }
     } else if (scan_count == 5) {
-      for (unsigned char c=keybuf_begin; c!=keybuf_end; c++) {
-        int i = c;
-        if (keybufs[i].frame < 18) {
-          keybufs[i].frame ++;
-        } else {
-          keybuf_begin ++;
+        for (unsigned char c=keybuf_begin; c!=keybuf_end; c++) {
+            int i = c;
+            if (keybufs[i].frame < 18) {
+                keybufs[i].frame ++;
+            } else {
+                keybuf_begin ++;
+            }
         }
-      }
     } else if (scan_count >= 6 && scan_count <= 10) {
-      int y = scan_count - 6;
-      for (int x=0; x<keys[y]; x++) {
-        int at = keys_sum[y] + ((y & 1) ? x : (keys[y] - x - 1));
-        led[at].r = rgb[x][y][0];
-        led[at].g = rgb[x][y][1];
-        led[at].b = rgb[x][y][2];
-      }
-      rgblight_set();
+        int y = scan_count - 6;
+        for (int x=0; x<keys[y]; x++) {
+            int at = keys_sum[y] + ((y & 1) ? x : (keys[y] - x - 1));
+            led[at].r = rgb[x][y][0];
+            led[at].g = rgb[x][y][1];
+            led[at].b = rgb[x][y][2];
+        }
+        rgblight_set();
     } else if (scan_count == 11) {
-      memset(rgb, 0, sizeof(rgb));
+        memset(rgb, 0, sizeof(rgb));
     }
     scan_count++;
-    if (scan_count >= 12) { scan_count = 0; }
+    if (scan_count >= 12) scan_count = 0;
 }
 #endif
 
+//
 // main
+//
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
@@ -583,12 +600,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
     // shift in kana layer
 
-    if (record->event.pressed){
-        if (keycode != KC_LAST && keycode < KN_SAFE_RANGE){
+    if (record->event.pressed) {
+        if (keycode != KC_LAST && keycode < KN_SAFE_RANGE) {
             last_pressed_key = keycode; }
     // set_timelog();
     //
-        switch (keycode){
+        switch (keycode) {
             // process KC_MS_BTN1~8 by myself
             // See process_action() in quantum/action.c for details.
             //case KC_MS_BTN1 ... KC_MS_BTN8: {
@@ -617,17 +634,19 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 keycode = KN_SHFT;
                 break;
             case N_RAISE:
-                if (! sft_l_x_interrupted){
+                if (! sft_l_x_interrupted) {
                     kana_off(! sft_l_x_interrupted, use_fn_for_ime_toggle);
-                    return false; };
+                    return false;
+                }
                 break;
             // Safety net
             default:
                sft_l_x_interrupted = (get_mods() & MOD_BIT(KC_LSFT)) != MOD_BIT(KC_LSFT);
                sft_r_x_interrupted = (get_mods() & MOD_BIT(KC_RSFT)) != MOD_BIT(KC_RSFT);
-               break; }
+               break;
+        }
     } else {
-        switch (keycode){
+        switch (keycode) {
             case KC_xLSFT:
                 unregister_code(KC_LSFT);
                 delayed_l_sfted_keypressed = false;
@@ -656,37 +675,33 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
     switch (keycode) {
         case KC_QWT:
-            if (record->event.pressed){
-                layer_on(_QWT); }
+            if (record->event.pressed) {
+                layer_on(_QWT);
+            }
             return false;
-            break;
         case KC_LOWER:
             layer_switch_with_tapping(_LOWER, KC_SPC, &lower_interrupted, &last_pressed_lower, record, keycode);
             return false;
-            break;
         case KC_RAISE:
             layer_switch_with_tapping(_RAISE, KC_SPC, &raise_interrupted, &last_pressed_raise, record, keycode);
             return false;
-            break;
         case N_LOWER:
             layer_switch_with_tapping(_LOWER, KC_SPC, &lower_interrupted, &last_pressed_lower, record, keycode);
             return false;
-            break;
         case N_RAISE:
             layer_switch_with_tapping(_RAISE, KC_SPC, &raise_interrupted, &last_pressed_raise, record, keycode);
             return false;
-            break;
         // kana
         case N_CTRL:
 //            if (record->event.pressed) {
 //                register_code(KC_LCTL);
-//                if (kana_state()){
+//                if (kana_state()) {
 //                    keep_kana = true;
 //                    kana_off_keep_ime(); }
 //                layer_on(_QWT); }
 //            else {
 //                layer_off(_LOWER);
-//                if (keep_kana){
+//                if (keep_kana) {
 //                    keep_kana = false;
 //                    kana_on(); }
 //                unregister_code(KC_LCTL); }
@@ -706,66 +721,75 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             send_key_set(keycode, KC_LBRC, KC_RBRC, record);
             return false;
         case KC_MN_C:
-            if (record->event.pressed){
-                if (! ctrl_l_interrupted || get_mods() & MOD_MASK_CTRL){
-                    tap_code16(KC_C); }
-                else {
+            if (record->event.pressed) {
+                if (! ctrl_l_interrupted || get_mods() & MOD_MASK_CTRL) {
+                    tap_code16(KC_C);
+                } else {
                     tap_code(KC_MINUS);
-                    last_pressed_key = KC_MINUS; } }
+                    last_pressed_key = KC_MINUS;
+                }
+            }
             return false;
         case KC_ALT_EX:
-            if (record->event.pressed){
+            if (record->event.pressed) {
                 register_code(KC_LALT);
-                layer_on(_ALT_WIN); }
-            else {
+                layer_on(_ALT_WIN);
+            } else {
                 layer_off(_ALT_WIN);
-                unregister_code(KC_LALT); }
+                unregister_code(KC_LALT);
+            }
             return false;
         case KC_WIN_EX:
             if (! layer_state_is(_QWT)) {
-                if (record->event.pressed){
+                if (record->event.pressed) {
                     register_code(KC_LWIN);
-                    layer_on(_ALT_WIN_B); }
-                else {
+                    layer_on(_ALT_WIN_B);
+                } else {
                     layer_off(_ALT_WIN_B);
-                    unregister_code(KC_LWIN); } }
-            else {
-                if (record->event.pressed){
+                    unregister_code(KC_LWIN);
+                }
+            } else {
+                if (record->event.pressed) {
                     register_code(KC_LWIN);
-                    layer_on(_ALT_WIN); }
-                else {
+                    layer_on(_ALT_WIN);
+                } else {
                     layer_off(_ALT_WIN);
-                    unregister_code(KC_LWIN); } }
+                    unregister_code(KC_LWIN);
+                }
+            }
             return false;
-            break;
         case KC_ALPH:
             if (record->event.pressed) {
-                layer_on(_ALPHABET); }
+                layer_on(_ALPHABET);
+            }
             break;
         case KC_L_NUM:
             if (record->event.pressed) {
-                layer_on(_ONLY_NUMBERS); }
+                layer_on(_ONLY_NUMBERS);
+            }
             break;
         case KC_ASIDE:
             if (record->event.pressed) {
-                layer_on(_ONE_SIDE); }
+                layer_on(_ONE_SIDE);
+            }
             break;
         case KC_RGB:
             if (record->event.pressed) {
-                layer_on(_RGB); }
+                layer_on(_RGB);
+            }
             break;
         case KC_LAST:
             if (record->event.pressed) {
-                tap_code(last_pressed_key); }
+                tap_code(last_pressed_key);
+            }
             return false;
-            break;
         case KC_FN_EX:
-            if (record->event.pressed){
-                layer_on(_FN); }
-            else {
-                layer_off(_FN); }
+            if (record->event.pressed) {
+                layer_on(_FN);
+            } else {
+                layer_off(_FN);
+            }
             return false;
-            break;
         case KC_ALLUP:
             clear_all_flags();
             up_all_modKeys();
@@ -795,49 +819,58 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 layer_off(_ONLY_NUMBERS);
                 layer_off(_RAISE);
                 layer_off(_LOWER);
-                set_single_persistent_default_layer(_ALPHABET); }
+                set_single_persistent_default_layer(_ALPHABET);
+            }
             return false;
         case KC_TGL_IME_FN:
             if (record->event.pressed) {
                 if (use_fn_for_ime_toggle) {
-                    use_fn_for_ime_toggle = false; }
-                else {
-                    use_fn_for_ime_toggle = true; } }
+                    use_fn_for_ime_toggle = false;
+                } else {
+                    use_fn_for_ime_toggle = true;
+                }
+            }
             return false;
         case RGBRST:
             #ifdef RGBLIGHT_ENABLE
-                if (record->event.pressed) {
-                    eeconfig_update_rgblight_default();
-                    rgblight_enable();
-                    RGBAnimation = false; }
+            if (record->event.pressed) {
+                eeconfig_update_rgblight_default();
+                rgblight_enable();
+                RGBAnimation = false;
+            }
             #endif
             break;
         case RGBOFF:
             #ifdef RGBLIGHT_ENABLE
-                if (record->event.pressed) {
-                    // doesn't work...
-                    rgblight_disable(); }
+            if (record->event.pressed) {
+                // doesn't work...
+                rgblight_disable();
+            }
             #endif
             break;
         case RGB1:
             #ifdef RGBLIGHT_ENABLE
-                if (record->event.pressed) {
-                    RGBAnimation = true;
-                    rgblight_mode(RGB_MODE_RAINBOW_MOOD); }
+            if (record->event.pressed) {
+                RGBAnimation = true;
+                rgblight_mode(RGB_MODE_RAINBOW_MOOD);
+            }
             #endif
             break;
         case RGB2:
             #ifdef RGBLIGHT_ENABLE
-                if (record->event.pressed) {
-                    RGBAnimation = true;
-                    rgblight_mode(RGB_MODE_RAINBOW_SWIRL + 1); } // additional number
+            if (record->event.pressed) {
+                RGBAnimation = true;
+                // additional number
+                rgblight_mode(RGB_MODE_RAINBOW_SWIRL + 1);
+            }
             #endif
             break;
         case RGB3:
             #ifdef RGBLIGHT_ENABLE
-                if (record->event.pressed) {
-                    RGBAnimation = true;
-                    rgblight_mode(RGB_MODE_KNIGHT); }
+            if (record->event.pressed) {
+                RGBAnimation = true;
+                rgblight_mode(RGB_MODE_KNIGHT);
+            }
             #endif
             break;
         // kana
@@ -852,44 +885,44 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             if (keycode < KN_SAFE_RANGE) {
                 if (record->event.pressed) {
                     switch (keycode) {
-                        case KN_I: kana_i_pressed = true; last_pressed_kana_i = timer_read(); break;
-                        case KN_O: kana_o_pressed = true; last_pressed_kana_o = timer_read(); break;
+                        case KN_A: kana_a_pressed = true; last_pressed_kana_a = timer_read(); break;
+                        case KN_S: kana_s_pressed = true; last_pressed_kana_s = timer_read(); break;
+                        case KN_D: kana_d_pressed = true; last_pressed_kana_d = timer_read(); break;
                         case KN_K: kana_k_pressed = true; last_pressed_kana_k = timer_read(); break;
                         case KN_L: kana_l_pressed = true; last_pressed_kana_l = timer_read(); break;
                         case KN_J: kana_j_pressed = true; last_pressed_kana_j = timer_read(); break;
-                        case KN_M: kana_m_pressed = true; last_pressed_kana_m = timer_read(); break;
-                        case KN_N: kana_n_pressed = true; last_pressed_kana_n = timer_read(); break;
+                        case KN_F: kana_f_pressed = true; last_pressed_kana_f = timer_read(); break;
                         default: break;
                     }
-                    // KN_J + KN_M: kana off
-                    if (kana_j_pressed && kana_m_pressed && abs(timer_elapsed(last_pressed_kana_j) - timer_elapsed(last_pressed_kana_m)) < COMBO_TERM) {
+                    // KN_D + KN_F: kana off
+                    if (kana_d_pressed && kana_f_pressed && abs(timer_elapsed(last_pressed_kana_d) - timer_elapsed(last_pressed_kana_f)) < COMBO_TERM) {
                         kana_off(! sft_l_x_interrupted, use_fn_for_ime_toggle);
                         suppress_kana = true;
-                    }
-                    // KN_J + KN_N: Do nothing (kana on)
-                    else if (kana_j_pressed && kana_n_pressed && abs(timer_elapsed(last_pressed_kana_j) - timer_elapsed(last_pressed_kana_n)) < COMBO_TERM) {
+                    // KN_J + KN_K: Do nothing (kana on)
+                    } else if (kana_j_pressed && kana_k_pressed && abs(timer_elapsed(last_pressed_kana_j) - timer_elapsed(last_pressed_kana_k)) < COMBO_TERM) {
                         suppress_kana = true;
-                    }
-                    // KN_I + KN_O: KC_ESC
-                    else if (kana_i_pressed && kana_o_pressed && abs(timer_elapsed(last_pressed_kana_i) - timer_elapsed(last_pressed_kana_o)) < COMBO_TERM) {
+                    // KN_S + KN_D: KC_ESC
+                    } else if (kana_s_pressed && kana_d_pressed && abs(timer_elapsed(last_pressed_kana_s) - timer_elapsed(last_pressed_kana_d)) < COMBO_TERM) {
                         suppress_kana = true;
                         tap_code16(KC_ESC);
-                    }
                     // KN_K + KN_L: KC_ENTER
-                    else if (kana_k_pressed && kana_l_pressed && abs(timer_elapsed(last_pressed_kana_k) - timer_elapsed(last_pressed_kana_l)) < COMBO_TERM) {
+                    } else if (kana_k_pressed && kana_l_pressed && abs(timer_elapsed(last_pressed_kana_k) - timer_elapsed(last_pressed_kana_l)) < COMBO_TERM) {
                         suppress_kana = true;
                         tap_code16(KC_ENTER);
+                    // KN_A + KN_S: KC_TAB
+                    } else if (kana_a_pressed && kana_s_pressed && abs(timer_elapsed(last_pressed_kana_a) - timer_elapsed(last_pressed_kana_s)) < COMBO_TERM) {
+                        suppress_kana = true;
+                        tap_code16(KC_TAB);
                     }
-                }
-                else {
+                } else {
                     switch (keycode) {
-                        case KN_I: kana_i_pressed = false; break;
-                        case KN_O: kana_o_pressed = false; break;
+                        case KN_A: kana_a_pressed = false; break;
+                        case KN_S: kana_s_pressed = false; break;
+                        case KN_D: kana_d_pressed = false; break;
                         case KN_K: kana_k_pressed = false; break;
                         case KN_L: kana_l_pressed = false; break;
                         case KN_J: kana_j_pressed = false; break;
-                        case KN_M: kana_m_pressed = false; break;
-                        case KN_N: kana_n_pressed = false; break;
+                        case KN_F: kana_f_pressed = false; break;
                         default: break;
                     }
                     if (suppress_kana) {
@@ -933,8 +966,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                         register_code(keycode);
                         unregister_code(KC_LSFT);
                         clear_all_flags();
-                        return false; } }
-                    // never reached here now... but works 2021/01
+                        return false;
+                    }
+                }
+                // never reached here now... but works 2021/01
                 if (timer_elapsed(last_pressed_shf_x_r) < TAP_TIME && ! delayed_r_sfted_keypressed) {
                     //if (sft_l_x_interrupted && ! (get_mods() & MOD_MASK_SHIFT)) {
                     if (sft_l_x_interrupted) {
@@ -944,14 +979,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                             register_code(keycode);
                             unregister_code(KC_RSFT);
                             clear_all_flags();
-                            return false; }
-                        else {
+                            return false;
+                        } else {
                             clear_all_flags();
-                            return true; } } }
+                            return true;
+                        }
+                    }
+                }
 
                 clear_all_flags();
-            }
-            else {
+            } else {
                 unregister_code(keycode);
             }
             break; }
